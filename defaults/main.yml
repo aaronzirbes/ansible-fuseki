@@ -1,0 +1,7 @@
+---
+app_port: 8080
+fuseki_group_name: fuseki
+fuseki_user_name: fuseki
+consul_service_name: fuseki
+app_install_dir: fuseki
+app_service_name: fuseki

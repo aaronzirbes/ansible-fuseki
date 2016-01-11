@@ -1,0 +1,39 @@
+---
+- name: Create temp folder to hold Fuseki
+  file: path=/tmp/fuseki state=directory
+
+- name: Download fuseki to temp folder
+  get_url: url=http://shinyfeather.com/jena/binaries/apache-jena-fuseki-{{fuseki_version}}.tar.gz
+           dest=/tmp/fuseki/apache-jena-fuseki.tar.gz
+
+- name: Add {{fuseki_group_name}} group
+  group: name={{fuseki_group_name}} system=yes
+
+- name: Add {{fuseki_user_name}} user
+  user: name={{fuseki_user_name}}
+        group={{fuseki_group_name}}
+        system=yes
+
+- name: log folder for {{app_install_dir}}
+  file: path=/var/log/{{app_install_dir}}
+        state=directory
+        owner={{fuseki_user_name}}
+        group={{fuseki_group_name}}
+
+- name: Copy over upstart script
+  template: src=upstart.conf
+            dest=/etc/init/{{app_service_name}}.conf
+
+- name: Copy over startup script
+  template: src=startup.sh
+            dest=/usr/local/{{app_install_dir}}/startup.sh
+
+- name: Set ownership of {{app_install_dir}} directory
+  file: path=/usr/local/{{app_install_dir}}
+        state=directory
+        owner={{fuseki_user_name}}
+        group={{fuseki_group_name}}
+        mode=0755
+        recurse=yes
+
+- include: consul-health.yml

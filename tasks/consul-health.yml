@@ -1,0 +1,7 @@
+---
+- name: Create consul.d directory if needed
+  file: path=/etc/consul.d state=directory
+
+- name: Copy over consul health check configuration
+  template: src=consul.json dest=/etc/consul.d/{{consul_service_name}}.json
+
