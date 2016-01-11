@@ -1,10 +1,17 @@
 ---
-- name: Create temp folder to hold Fuseki
-  file: path=/tmp/fuseki state=directory
 
-- name: Download fuseki to temp folder
+- name: Download Fuseki Tarball
   get_url: url=http://shinyfeather.com/jena/binaries/apache-jena-fuseki-{{fuseki_version}}.tar.gz
-           dest=/tmp/fuseki/apache-jena-fuseki.tar.gz
+           dest=/tmp/apache-jena-fuseki-{{fuseki_version}}.tar.gz
+
+- name: Extract Fuseki
+  unarchive: src=/tmp/apache-jena-fuseki-{{fuseki_version}}.tar.gz
+             dest=/usr/local
+             copy=no
+             mode=0755
+
+- name: Move the app install folder to it's final resting place
+  command: mv /usr/local/apache-jena-fuseki-{{fuseki_version}}/ /usr/local/{{app_install_dir}}
 
 - name: Add {{fuseki_group_name}} group
   group: name={{fuseki_group_name}} system=yes
@@ -13,6 +20,14 @@
   user: name={{fuseki_user_name}}
         group={{fuseki_group_name}}
         system=yes
+
+- name: Create folder for Fuseki data
+  file: path=/var/lib/{{app_install_dir}}
+        state=directory
+        owner={{fuseki_user_name}}
+        group={{fuseki_group_name}}
+        mode=0750
+
 
 - name: log folder for {{app_install_dir}}
   file: path=/var/log/{{app_install_dir}}
