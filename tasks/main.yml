@@ -1,54 +1,77 @@
 ---
 
 - name: Download Fuseki Tarball
-  get_url: url=http://shinyfeather.com/jena/binaries/apache-jena-fuseki-{{fuseki_version}}.tar.gz
-           dest=/tmp/apache-jena-fuseki-{{fuseki_version}}.tar.gz
+  get_url:
+    url: "http://shinyfeather.com/jena/binaries/apache-jena-fuseki-{{fuseki_version}}.tar.gz"
+    dest: "/tmp/apache-jena-fuseki-{{fuseki_version}}.tar.gz"
 
 - name: Extract Fuseki
-  unarchive: src=/tmp/apache-jena-fuseki-{{fuseki_version}}.tar.gz
-             dest=/usr/local
-             copy=no
-             mode=0755
+  unarchive:
+    src: "/tmp/apache-jena-fuseki-{{fuseki_version}}.tar.gz"
+    dest: /usr/local
+    copy: no
+    mode: 0755
 
 - name: Move the app install folder to it's final resting place
-  command: mv /usr/local/apache-jena-fuseki-{{fuseki_version}}/ /usr/local/{{app_install_dir}}
+  command: "mv /usr/local/apache-jena-fuseki-{{fuseki_version}} /usr/local/{{app_install_dir}}"
 
-- name: Add {{fuseki_group_name}} group
+- name: "Add {{fuseki_group_name}} group"
   group: name={{fuseki_group_name}} system=yes
 
-- name: Add {{fuseki_user_name}} user
-  user: name={{fuseki_user_name}}
-        group={{fuseki_group_name}}
-        system=yes
+- name: "Add {{fuseki_user_name}} user"
+  user:
+    name: "{{fuseki_user_name}}"
+    group: "{{fuseki_group_name}}"
+    system: yes
+
+- name: Create run folder for shiro ini to reside in
+  file:
+    path: "/usr/local/{{app_install_dir}}/run"
+    state: directory
+    owner: "{{fuseki_user_name}}"
+    group: "{{fuseki_group_name}}"
+    mode: 0750
+
+- name: Copy over shiro security configuration
+  copy:
+    src: shiro.ini
+    dest: "/usr/local/{{app_install_dir}}/run/shiro.ini"
+    owner: "{{fuseki_user_name}}"
+    group: "{{fuseki_group_name}}"
+    mode: 0644
 
 - name: Create folder for Fuseki data
-  file: path=/var/lib/{{app_install_dir}}
-        state=directory
-        owner={{fuseki_user_name}}
-        group={{fuseki_group_name}}
-        mode=0750
+  file:
+    path: /var/lib/{{app_install_dir}}
+    state: directory
+    owner: "{{fuseki_user_name}}"
+    group: "{{fuseki_group_name}}"
+    mode: 0750
 
-
-- name: log folder for {{app_install_dir}}
-  file: path=/var/log/{{app_install_dir}}
-        state=directory
-        owner={{fuseki_user_name}}
-        group={{fuseki_group_name}}
+- name: "log folder for {{app_install_dir}}"
+  file:
+    path: /var/log/{{app_install_dir}}
+    state: directory
+    owner: "{{fuseki_user_name}}"
+    group: "{{fuseki_group_name}}"
 
 - name: Copy over upstart script
-  template: src=upstart.conf
-            dest=/etc/init/{{app_service_name}}.conf
+  template:
+    src: upstart.conf
+    dest: /etc/init/{{app_service_name}}.conf
 
 - name: Copy over startup script
-  template: src=startup.sh
-            dest=/usr/local/{{app_install_dir}}/startup.sh
+  template:
+    src: startup.sh
+    dest: /usr/local/{{app_install_dir}}/startup.sh
 
-- name: Set ownership of {{app_install_dir}} directory
-  file: path=/usr/local/{{app_install_dir}}
-        state=directory
-        owner={{fuseki_user_name}}
-        group={{fuseki_group_name}}
-        mode=0755
-        recurse=yes
+- name: "Set ownership of {{app_install_dir}} directory"
+  file:
+    path: /usr/local/{{app_install_dir}}
+    state: directory
+    owner: "{{fuseki_user_name}}"
+    group: "{{fuseki_group_name}}"
+    mode: 0755
+    recurse: yes
 
 - include: consul-health.yml
