@@ -4,7 +4,7 @@
         "tags": ["master", "app"],
         "port": {{app_port}},
         "check": {
-            "script": "curl --silent --show-error --dump-header /dev/stderr --fail localhost:{{app_port}}/\$/server >/dev/null",
+            "script": "curl --silent --show-error --dump-header /dev/stderr --fail localhost:{{app_port}}/\\$/server >/dev/null",
             "interval": "10s"
         }
     }
