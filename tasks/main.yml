@@ -1,20 +1,5 @@
 ---
 
-- name: Download Fuseki Tarball
-  get_url:
-    url: "http://apache.mirrors.ionfish.org/jena/binaries/apache-jena-fuseki-{{fuseki_version}}.tar.gz"
-    dest: "/tmp/apache-jena-fuseki-{{fuseki_version}}.tar.gz"
-
-- name: Extract Fuseki
-  unarchive:
-    src: "/tmp/apache-jena-fuseki-{{fuseki_version}}.tar.gz"
-    dest: /usr/local
-    copy: no
-    mode: 0755
-
-- name: Move the app install folder to it's final resting place
-  command: "mv /usr/local/apache-jena-fuseki-{{fuseki_version}} /usr/local/{{app_install_dir}}"
-
 - name: "Add {{fuseki_group_name}} group"
   group: name={{fuseki_group_name}} system=yes
 
@@ -23,6 +8,19 @@
     name: "{{fuseki_user_name}}"
     group: "{{fuseki_group_name}}"
     system: yes
+
+- name: Download and Extract Fuseki
+  unarchive:
+    remote_src: yes
+    src: "http://apache.mirrors.ionfish.org/jena/binaries/apache-jena-fuseki-{{fuseki_version}}.tar.gz"
+    dest: /usr/local
+    owner: root
+    group: root
+    copy: no
+    mode: 0755
+
+- name: Move the app install folder to it's final resting place
+  command: "mv /usr/local/apache-jena-fuseki-{{fuseki_version}} /usr/local/{{app_install_dir}}"
 
 - name: Create run folder for shiro ini to reside in
   file:
