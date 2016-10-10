@@ -2,7 +2,7 @@
 
 - name: Download Fuseki Tarball
   get_url:
-    url: "http://shinyfeather.com/jena/binaries/apache-jena-fuseki-{{fuseki_version}}.tar.gz"
+    url: "http://apache.mirrors.ionfish.org/jena/binaries/apache-jena-fuseki-{{fuseki_version}}.tar.gz"
     dest: "/tmp/apache-jena-fuseki-{{fuseki_version}}.tar.gz"
 
 - name: Extract Fuseki
