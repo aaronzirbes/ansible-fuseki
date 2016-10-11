@@ -9,6 +9,12 @@ DATA_DIR=/var/lib/{{app_name}}
 PORT={{app_port}}
 DEFAULT_DB=default
 
+JVM_ARGS='-Djava.net.preferIPv4Stack=true'
+
+function setDataPermissions() {
+    chown -R ${USER}:${USER} ${DATA_DIR}
+}
+
 function setLogPermissions() {
     # fix permissions on the log and pid files
     if [ ! -d ${LOG_DIR} ]; then
@@ -19,8 +25,9 @@ function setLogPermissions() {
 }
 
 setLogPermissions
+setDataPermissions
 
-CMD="${APP_DIR}/fuseki-server --loc=${DATA_DIR} --port=${PORT} --update /${DEFAULT_DB}"
+CMD="JVM_ARGS='${JVM_ARGS}' ${APP_DIR}/fuseki-server --loc=${DATA_DIR} --port=${PORT} --update /${DEFAULT_DB}"
 echo "`date` - Executing: ${CMD}"
 exec /bin/su - ${USER} -c "cd ${APP_DIR}; ${CMD} >> ${APP_LOG} 2>&1"
 
